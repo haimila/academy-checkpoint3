@@ -1,0 +1,46 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Checkpoint3
+
+Parameters:
+  OmaNimi:
+    Type: String
+    Default: "Mitja"
+
+  UusinAmi:
+    Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
+    Default: '/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2'
+
+Resources:
+
+  SecurityGrouppi:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: ec2 security group
+      GroupName: mitja-cf-ec2-sg
+      SecurityGroupIngress:
+        FromPort: 22
+          ToPort: 22
+          IpProtocol: Tcp
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: mitja-checkpoint3
+
+  Instanssi:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref UusinAmi
+      InstanceType: t2.nano
+      KeyName: mitjanavain-tokyo
+      SecurityGroupIds:
+        - !Ref SecurityGrouppi
+      Tags:
+        - Key: Owner
+          Value: Mitja
+
+Outputs:
+  InstanssiDNS:
+    Value: !GetAtt Instanssi.PublicDnsName
+
+
+
