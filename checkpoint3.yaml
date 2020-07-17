@@ -1,6 +1,13 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: Checkpoint3
 
+# HUOM! AWS CLI:n kautta launchatessa lisää deploy-komentoon avainparisi nimi:
+#     --parameter-overrides KeyName=avainparisinimi
+# Näin pystyt käyttämään templatea jokaisella regionilla, johon sinulla on
+# avainpari (muista lisätä myös region parametriksi, jos et launchaa defaultiin).
+# Vaihtoehtoisesti voit käyttää Management Consolea ja valita avainparin
+# pudotusvalikosta.
+
 Parameters:
   OmaNimi:
     Type: String
@@ -10,9 +17,10 @@ Parameters:
     Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
     Default: '/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2'
 
-  Avain:
-    Description: EC2-avainpari SSH-yhteyttä varten
-    Type: 'AWS::EC2::KeyPair::KeyName'
+  KeyName:
+    Description: EC2-keypair for SSH connection
+    Type: AWS::EC2::KeyPair::KeyName
+    Default: mitjanavain-tokyo
 
 Resources:
 
@@ -39,7 +47,7 @@ Resources:
     Properties:
       ImageId: !Ref UusinAmi
       InstanceType: t2.nano
-      KeyName: !Ref Avain
+      KeyName: !Ref KeyName
       SecurityGroupIds:
         - !Ref SecurityGrouppi
       Tags:
@@ -59,7 +67,6 @@ Resources:
   UusiBucket:
       Type: AWS::S3::Bucket
       Properties:
-        BucketName: mitja-checkpoint3
         Tags:
           - Key: Owner
             Value: !Ref OmaNimi
