@@ -18,8 +18,12 @@ Resources:
       GroupDescription: ec2 security group
       GroupName: mitja-cf-ec2-sg
       SecurityGroupIngress:
-        FromPort: 22
+        - FromPort: 22
           ToPort: 22
+          IpProtocol: Tcp
+          CidrIp: 0.0.0.0/0
+        - FromPort: 80
+          ToPort: 80
           IpProtocol: Tcp
           CidrIp: 0.0.0.0/0
       Tags:
@@ -37,6 +41,28 @@ Resources:
       Tags:
         - Key: Owner
           Value: Mitja
+      UserData:
+          Fn::Base64:
+            Fn::Join:
+              - "\n"
+              - - "#!/bin/bash"
+                - "amazon-linux-extras install epel"
+                - "amazon-linux-extras install nginx1"
+                - "systemctl start nginx"
+
+  UusiBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: mitja-checkpoint3
+        Tags:
+          - Key: Owner
+            Value: !Ref OmaNimi
+
+  UusiParametri:
+      Type: AWS::SSM::Parameter
+      Properties:
+        Type: String
+        Value: !GetAtt UusiBucket.Arn
 
 Outputs:
   InstanssiDNS:
